@@ -1,0 +1,38 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/DMux8Way.hdl
+/**
+ * 8-way demultiplexor:
+ * [a, b, c, d, e, f, g, h] = [in, 0, 0, 0, 0, 0, 0, 0] if sel == 000
+ *                            [0, in, 0, 0, 0, 0, 0, 0] if sel == 001
+ *                            ...
+ *                            [0, 0, 0, 0, 0, 0, 0, in] if sel == 111
+ */
+CHIP DMux8Way {
+    IN in, sel[3];
+    OUT a, b, c, d, e, f, g, h;
+
+    PARTS:
+    /First 2 bits determine the form 
+    ///third bit determines which side is padded with zeros
+
+    Not(in=sel[0],out=notSel0);
+    And(a=sel[0],b=notSel0,out=zero);
+    Not(in=zero,out=one);
+
+    DMux4Way(in=in,sel=sel[0..1],a=aForm,b=bForm,c=cForm,d=dForm); 
+    Mux(a=zero,b=one,sel=sel[2],out=zerosPlace); //0=e,f,g,h 1=a,b,c,d
+    Not(in=zerosPlace,out=formsPlace); //0=a,b,c,d 1=e,f,g,h
+
+
+     Mux(a=zero,b=aForm,sel=formsPlace,out=a);
+     Mux(a=zero,b=bForm,sel=formsPlace,out=b);
+     Mux(a=zero,b=cForm,sel=formsPlace,out=c);
+     Mux(a=zero,b=dForm,sel=formsPlace,out=d);
+
+     Mux(a=zero,b=aForm,sel=zerosPlace,out=e);
+     Mux(a=zero,b=bForm,sel=zerosPlace,out=f);
+     Mux(a=zero,b=cForm,sel=zerosPlace,out=g);
+     Mux(a=zero,b=dForm,sel=zerosPlace,out=h);
+}

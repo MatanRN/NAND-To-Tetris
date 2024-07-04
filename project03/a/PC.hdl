@@ -1,0 +1,24 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/a/PC.hdl
+
+/**
+ * if      reset[t]:   out[t+1] = 0
+ * else if load[t]:  out[t+1] = in[t]
+ * else if inc[t]:    out[t+1] = out[t] + 1
+ * else                 out[t+1] = out[t]
+ *
+ * To select a mode, assert the relevant control bit,
+ * and de-assert the other two bits. 
+ */
+CHIP PC {
+    IN in[16],inc, load, reset;
+    OUT out[16];
+    
+    PARTS:
+    And16(a=currOut,b=false,out=resetOut);
+    Inc16(in=currOut,out=incRes);
+    Mux8Way16(a=currOut,b=resetOut,c=in,d=resetOut,e=incRes,f=resetOut,g=in,h=resetOut,sel[0]=reset,sel[1]=load,sel[2]=inc,out=chosenRes);
+    Register(in=chosenRes,load=true, out=currOut,out=out);
+}
